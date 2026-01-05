@@ -771,6 +771,7 @@
                 const q = this.data.currentQuestions[this.data.currentIndex];
                 const answeredSet = new Set(this.data.currentAnswer);
                 const optKeys = Object.keys(q.options);
+                const isMulti = q.type === '多选题';
                 
                 optKeys.forEach(key => {
                     const isSelected = answeredSet.has(key);
@@ -778,15 +779,21 @@
                     if (!optionCard) return;
                     
                     const iconContainer = optionCard.querySelector('.option-icon');
-                    const isMulti = q.type === '多选题';
+                    if (!iconContainer) return;
                     
-                    optionCard.className = `option-card flex items-start gap-3 p-4 rounded-xl border-2 bg-white border-gray-200 cursor-pointer`;
-                    iconContainer.className = `w-8 h-8 rounded-lg border border-current flex items-center justify-center flex-shrink-0 border-gray-300 text-gray-400`;
+                    optionCard.classList.remove('bg-indigo-50', 'border-indigo-400');
+                    optionCard.classList.add('bg-white', 'border-gray-200');
+                    
+                    iconContainer.classList.remove('border-indigo-400', 'bg-indigo-100', 'text-indigo-600');
+                    iconContainer.classList.add('border-gray-300', 'text-gray-400');
                     iconContainer.innerHTML = `<span class="font-bold">${key}</span>`;
                     
                     if (isSelected) {
-                        optionCard.className = `option-card flex items-start gap-3 p-4 rounded-xl border-2 bg-indigo-50 border-indigo-400 cursor-pointer`;
-                        iconContainer.className = `w-8 h-8 rounded-lg border border-current flex items-center justify-center flex-shrink-0 border-indigo-400 bg-indigo-100 text-indigo-600`;
+                        optionCard.classList.remove('bg-white', 'border-gray-200');
+                        optionCard.classList.add('bg-indigo-50', 'border-indigo-400');
+                        
+                        iconContainer.classList.remove('border-gray-300', 'text-gray-400');
+                        iconContainer.classList.add('border-indigo-400', 'bg-indigo-100', 'text-indigo-600');
                         iconContainer.innerHTML = `<i class="fa-solid fa-check"></i>`;
                     }
                 });
