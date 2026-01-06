@@ -11,861 +11,622 @@
         body { font-family: -apple-system, "Microsoft YaHei", sans-serif; -webkit-tap-highlight-color: transparent; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         
-        .option-card:active { transform: scale(0.98); background-color: #f3f4f6; }
-        .subject-card { background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%); }
-        .progress-bar { transition: width 0.3s ease; }
-        
-        /* 默认移动端布局 */
-        .app-layout {
-            display: block;
-            min-height: 100vh;
+        /* Watermark Style */
+        .watermark-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 0; /* Bottom layer */
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Slightly denser */
+            gap: 20px;
+            padding: 20px;
+            opacity: 0.15; 
         }
-        .sidebar {
+        .watermark-item {
+            display: flex;
+            flex-direction: column; /* Stack name and ID */
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-25deg);
+            color: #000;
+            font-size: 13px;
+            font-weight: 500;
+            user-select: none;
+            text-align: center;
+            line-height: 1.5;
+            padding: 20px 0;
+        }
+
+        /* Custom UI Elements from Image */
+        .quiz-option-card {
+            background: #fff; /* Opaque white background */
+            border: 1px solid #f0f0f0;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s;
+            position: relative;
+            z-index: 1; /* Above watermark */
+        }
+        .quiz-option-card.selected {
+            background-color: #e6f7ff;
+            border-color: #91d5ff;
+        }
+        .quiz-option-card.correct {
+            background-color: #f6ffed;
+            border-color: #b7eb8f;
+        }
+        .quiz-option-card.wrong {
+            background-color: #fff1f0;
+            border-color: #ffa39e;
+        }
+
+        .footer-next-btn {
+            background-color: #3b82f6; /* Blue */
+            color: white;
+            font-weight: 500;
+        }
+        
+        .progress-track {
+            height: 4px;
+            background-color: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #3b82f6;
+            transition: width 0.3s ease;
+        }
+
+        /* Hide default UI when in Quiz Mode */
+        body.quiz-mode {
+            background-color: #fff !important; /* White background for quiz */
+        }
+        body.quiz-mode .app-layout {
             display: none;
         }
-        .sidebar-toggle {
+        body.quiz-mode #quiz-ui {
+            display: flex;
+        }
+        #quiz-ui {
             display: none;
+            flex-direction: column;
+            height: 100vh;
+            background-color: transparent; /* Transparent to let body/watermark show */
+            position: relative;
+            z-index: 1; /* Above watermark */
         }
-        .main-content {
-            display: block;
-        }
+
+        /* Default Layout styles (preserved for non-quiz mode) */
+        .app-layout { display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 300px; background: white; border-right: 1px solid #e5e7eb; display: none; flex-direction: column; }
+        @media (min-width: 1024px) { .sidebar { display: flex; } }
+        .main-content { flex: 1; display: flex; flex-direction: column; background: #f9fafb; overflow: hidden; }
         
-        /* 电脑端布局 - 左右分栏 */
-        @media (min-width: 1024px) {
-            .app-layout {
-                display: flex;
-                height: 100vh;
-                overflow: hidden;
-            }
-            .sidebar {
-                display: flex;
-                width: 300px;
-                flex-shrink: 0;
-                background: white;
-                border-right: 1px solid #e5e7eb;
-                flex-direction: column;
-                overflow: hidden;
-            }
-            .sidebar-header {
-                padding: 20px;
-                border-bottom: 1px solid #e5e7eb;
-            }
-            .sidebar-content {
-                flex: 1;
-                overflow-y: auto;
-                padding: 16px;
-            }
-            .main-content {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-                overflow: hidden;
-                background: #f9fafb;
-            }
-            .main-header {
-                padding: 16px 24px;
-                background: white;
-                border-bottom: 1px solid #e5e7eb;
-                flex-shrink: 0;
-            }
-            .main-body {
-                flex: 1;
-                overflow-y: auto;
-                padding: 24px;
-            }
-            .main-footer {
-                padding: 16px 24px;
-                background: white;
-                border-top: 1px solid #e5e7eb;
-                flex-shrink: 0;
-            }
-            
-            /* 题目导航面板 */
-            #palette-panel {
-                flex-shrink: 0;
-            }
-            #palette-toggle {
-                display: inline-block !important;
-            }
-            
-            /* 题目导航网格 */
-            .question-palette {
-                display: grid;
-                grid-template-columns: repeat(10, 1fr);
-                gap: 8px;
-            }
-            .palette-btn {
-                aspect-ratio: 1;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border-radius: 8px;
-                font-size: 14px;
-                font-weight: 500;
-                cursor: pointer;
-                transition: all 0.15s ease;
-            }
-            .palette-btn:hover {
-                transform: scale(1.05);
-            }
-            .palette-btn.current {
-                ring: 2px;
-                ring-offset: 2px;
-            }
-            
-            /* 选项卡片优化 */
-            .option-card {
-                transition: all 0.2s ease;
-                cursor: pointer;
-                margin-bottom: 12px;
-            }
-            .option-card:hover {
-                background-color: #f3f4f6;
-                transform: translateX(4px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            }
-            
-            /* 学科卡片 */
-            .subject-item {
-                transition: all 0.2s ease;
-                cursor: pointer;
-            }
-            .subject-item:hover {
-                transform: translateX(4px);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            }
-            
-            /* 章节卡片 */
-            .chapter-item {
-                transition: all 0.15s ease;
-                cursor: pointer;
-            }
-            .chapter-item:hover {
-                background-color: #f9fafb;
-                border-color: #818cf8;
-            }
-            
-            /* 侧边栏切换按钮 */
-            .sidebar-toggle {
-                position: fixed;
-                left: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-                z-index: 100;
-                width: 24px;
-                height: 48px;
-                background: white;
-                border: 1px solid #e5e7eb;
-                border-left: none;
-                border-radius: 0 8px 8px 0;
-                cursor: pointer;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                box-shadow: 2px 0 8px rgba(0,0,0,0.05);
-            }
-            .sidebar.collapsed {
-                margin-left: -300px;
-            }
-            .sidebar.collapsed + .main-content {
-                margin-left: 0;
-            }
+        /* Mobile handling for default layout */
+        @media (max-width: 1024px) {
+            .app-layout { display: block; overflow-y: auto; }
+            .sidebar { display: none; }
+            .main-content { height: auto; }
         }
-        
-        /* 动画 */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease;
-        }
+
+        .animate-fade-in { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-gray-100 h-screen flex flex-col mx-auto shadow-2xl bg-white text-gray-800">
+<body class="bg-gray-100 h-screen text-gray-800">
 
-    <!-- 侧边栏切换按钮 -->
-    <button class="sidebar-toggle" onclick="toggleSidebar()">
-        <i class="fa-solid fa-chevron-left" id="toggle-icon"></i>
-    </button>
+    <!-- Watermark Container (Always present but visible based on context) -->
+    <div class="watermark-container" id="watermark-layer"></div>
 
-    <div class="app-layout">
-        <!-- 左侧边栏 -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="font-bold text-lg flex items-center gap-2">
-                    <i class="fa-solid fa-layer-group text-indigo-600"></i>
-                    刷题宝 Ultimate
-                </div>
+    <!-- 1. Default App Layout (Subject Selection, Chapter Selection) -->
+    <div class="app-layout" id="default-ui">
+        <!-- Sidebar (Desktop) -->
+        <aside class="sidebar">
+            <div class="p-5 border-b border-gray-100 font-bold text-lg flex items-center gap-2">
+                <i class="fa-solid fa-layer-group text-indigo-600"></i> 刷题宝 Ultimate
             </div>
-            <div class="sidebar-content">
-                <!-- 回到主界面 -->
-                <div id="back-to-home" onclick="app.renderSubjectList()" class="bg-gradient-to-r from-gray-600 to-gray-700 rounded-xl p-4 text-white cursor-pointer shadow-lg hover:shadow-xl transition-shadow mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-home"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-sm">回到主界面</div>
-                            <div class="text-xs text-gray-200">返回学科列表</div>
-                        </div>
-                    </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-4">
+                 <div onclick="app.renderSubjectList()" class="cursor-pointer p-3 rounded hover:bg-gray-50 flex items-center gap-3 text-gray-700">
+                    <i class="fa-solid fa-home"></i> 回到首页
                 </div>
-                <!-- 继续练习 -->
-                <div id="resume-section" class="mb-4 hidden">
-                    <div onclick="app.resumeQuiz()" class="bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl p-4 text-white cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                                <i class="fa-solid fa-play"></i>
-                            </div>
-                            <div>
-                                <div class="text-xs text-indigo-200 font-bold">继续上次练习</div>
-                                <div class="font-bold text-sm truncate max-w-[180px]" id="resume-title"></div>
-                            </div>
-                        </div>
-                    </div>
+                 <div onclick="app.toggleSettings()" class="cursor-pointer p-3 rounded hover:bg-gray-50 flex items-center gap-3 text-gray-700">
+                    <i class="fa-solid fa-user-cog"></i> 个人设置
                 </div>
-
-                <!-- 错题本 -->
-                <div onclick="app.startMistakeMode()" class="bg-white rounded-xl p-4 shadow-sm border border-red-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow mb-4">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-red-100 text-red-500 flex items-center justify-center">
-                            <i class="fa-solid fa-book-open"></i>
-                        </div>
-                        <div>
-                            <div class="font-bold text-gray-700">错题本</div>
-                            <div class="text-xs text-gray-500" id="mistakes-count">共 0 题</div>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-gray-300"></i>
-                </div>
-
-                <!-- 学科列表 -->
-                <div id="subjects-section">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">学科选择</h3>
-                    <div class="space-y-2" id="subjects-list"></div>
-                </div>
-
-                <!-- 章节列表 -->
-                <div id="chapters-section" class="hidden">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">章节练习</h3>
-                    <div class="space-y-2" id="chapters-list"></div>
-                </div>
-
-                <!-- 模拟考试 -->
-                <div id="exam-section" class="hidden mt-4 pt-4 border-t border-gray-100">
-                    <div onclick="app.startMockExam()" class="bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl p-4 text-white cursor-pointer shadow-lg hover:shadow-xl transition-shadow">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                                <i class="fa-solid fa-stopwatch"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-sm">全真模拟考试</div>
-                                <div class="text-xs text-orange-100">随机30题</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 底部链接 -->
-                <div class="mt-auto pt-4 border-t border-gray-100">
-                    <a href="https://vimalinx.xyz" target="_blank" class="bg-white rounded-xl p-4 shadow-sm border border-indigo-100 flex items-center justify-between cursor-pointer hover:shadow-md transition-shadow">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center">
-                                <i class="fa-solid fa-external-link-alt"></i>
-                            </div>
-                            <div>
-                                <div class="font-bold text-gray-700">看看七叶的小窝</div>
-                                <div class="text-xs text-gray-400">访问作者主页</div>
-                            </div>
-                        </div>
-                        <i class="fa-solid fa-chevron-right text-gray-300"></i>
-                    </a>
-                </div>
+                <div id="sidebar-content"></div>
             </div>
         </aside>
 
-        <!-- 主内容区 -->
+        <!-- Main Content -->
         <main class="main-content">
-            <!-- 顶部导航 -->
-            <header class="main-header flex justify-between items-center">
-                <div class="flex items-center gap-2 text-sm">
-                    <span id="header-status" class="text-gray-500">学科列表</span>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div id="stats-correct" class="text-sm text-green-600 hidden">
-                        <i class="fa-solid fa-check-circle"></i> <span>0</span>
-                    </div>
-                    <div id="stats-wrong" class="text-sm text-red-600 hidden">
-                        <i class="fa-solid fa-times-circle"></i> <span>0</span>
-                    </div>
-                    <!-- 题目导航切换按钮（仅电脑端） -->
-                    <button id="palette-toggle" onclick="app.togglePalette()" class="hidden px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg border border-gray-200">
-                        <i class="fa-solid fa-th mr-1"></i> 题目导航
-                    </button>
-                </div>
-            </header>
-
-            <!-- 题目导航面板（仅电脑端，可折叠） -->
-            <div id="palette-panel" class="hidden border-b border-gray-200 bg-white p-4">
-                <div class="question-palette" id="question-palette"></div>
+            <div class="p-4 bg-white border-b border-gray-200 flex justify-between items-center sticky top-0 z-20">
+                <div id="header-title" class="font-bold text-lg">刷题宝</div>
+                <div id="user-info" class="text-sm text-gray-500">李雪瑜 (202517040227)</div>
             </div>
-
-            <!-- 主内容 -->
-            <div class="main-body" id="main-container">
-                <div class="flex flex-col items-center justify-center h-full text-gray-400">
-                    <i class="fa-solid fa-circle-notch fa-spin text-3xl mb-3 text-indigo-500"></i>
-                    <p class="text-sm">资源加载中...</p>
-                    <p class="text-xs text-red-400 mt-4">请使用 http-server 或 live-server 运行</p>
-                </div>
+            
+            <div id="main-container" class="flex-1 overflow-y-auto p-4 pb-20">
+                <!-- Dynamic Content Here -->
             </div>
-
-            <!-- 底部栏 -->
-            <footer id="quiz-footer" class="main-footer hidden">
-                <!-- 底部操作栏 -->
-                <div class="flex justify-between items-center">
-                    <button onclick="app.prevQuestion()" class="px-4 py-2 text-gray-500 hover:bg-gray-100 rounded-lg text-sm font-medium">
-                        <i class="fa-solid fa-arrow-left mr-1"></i> 上一题
-                    </button>
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-bold text-gray-700"><span id="current-idx">1</span> / <span id="total-count">10</span></span>
-                    </div>
-                    <div id="action-btn-area"></div>
-                </div>
-            </footer>
         </main>
+    </div>
+
+    <!-- 2. Quiz Mode UI (Replicating the Image) -->
+    <div id="quiz-ui" class="bg-white">
+        <!-- Header -->
+        <header class="h-14 flex items-center px-4 bg-white border-b border-gray-100 flex-shrink-0 z-20 relative">
+            <button onclick="app.exitQuiz()" class="w-10 h-10 flex items-center justify-start text-gray-600">
+                <i class="fa-solid fa-chevron-left text-xl"></i>
+            </button>
+            <div class="flex-1 text-center font-medium text-lg text-gray-800">李雪瑜 (202517040227)</div>
+            <div class="w-10"></div> <!-- Spacer -->
+        </header>
+
+        <!-- Info Bar -->
+        <div class="flex items-center justify-between px-4 py-3 bg-white z-20 relative">
+            <div class="flex items-center gap-2 text-gray-600 text-sm">
+                <i class="fa-regular fa-clock text-gray-400"></i>
+                <span id="timer-display">00' 00"</span>
+            </div>
+            
+            <div class="flex items-center gap-3 flex-1 mx-4">
+                <span class="text-gray-600 text-sm" id="progress-text">1/10</span>
+                <div class="flex-1 progress-track bg-gray-100 rounded-full h-1.5">
+                    <div id="progress-bar" class="progress-fill rounded-full" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div onclick="app.togglePalette()" class="flex flex-col items-center text-gray-600 cursor-pointer">
+                <i class="fa-regular fa-newspaper text-lg mb-0.5"></i>
+                <span class="text-[10px]">答题卡</span>
+            </div>
+        </div>
+
+        <!-- Scrollable Question Area -->
+        <div class="flex-1 overflow-y-auto relative z-10" id="quiz-content">
+            <div class="p-4 pb-24">
+                <!-- Question Type Description -->
+                <div class="mb-6">
+                    <h2 class="text-lg font-bold text-gray-800 mb-2" id="q-type-title">单选题 (共36题，36.0分)</h2>
+                    <p class="text-sm text-gray-400 leading-relaxed text-justify" id="q-type-desc">
+                        题型说明: 1-36小题，每小题1分，共36分。下列每题给出的四个选项中，只有一个选项是符合题目要求的，请选出正确答案。多选、错选、不选均不得分
+                    </p>
+                </div>
+
+                <!-- Question Text -->
+                <div class="mb-8">
+                    <div class="text-lg text-gray-800 leading-relaxed font-medium">
+                        <span id="q-number">2.</span> <span class="text-gray-500 text-base font-normal">(1.0分)</span> 
+                        <span id="q-text">个人对社会的责任与贡献属于( )</span>
+                    </div>
+                </div>
+
+                <!-- Options List -->
+                <div id="q-options" class="space-y-4">
+                    <!-- Options injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="h-14 bg-white border-t border-gray-100 flex items-center fixed bottom-0 left-0 w-full z-30">
+            <button onclick="app.prevQuestion()" class="w-1/3 h-full flex items-center justify-center text-blue-500 text-base font-medium active:bg-gray-50">
+                上一题
+            </button>
+            <button onclick="app.nextQuestionOrSubmit()" id="next-btn-text" class="w-2/3 h-full flex items-center justify-center bg-blue-500 text-white text-base font-medium active:bg-blue-600">
+                下一题
+            </button>
+        </div>
+
+        <!-- Answer Card Modal (Palette) -->
+        <div id="palette-modal" class="fixed inset-0 z-50 hidden bg-black/50" onclick="app.togglePalette()">
+            <div class="absolute bottom-0 w-full bg-white rounded-t-2xl p-4 max-h-[70vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-gray-700">答题卡</h3>
+                    <i onclick="app.togglePalette()" class="fa-solid fa-times text-gray-400 p-2"></i>
+                </div>
+                <div id="palette-grid" class="grid grid-cols-6 gap-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 hidden bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl w-full max-w-sm p-6 shadow-2xl">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">个人信息设置</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">姓名</label>
+                    <input type="text" id="setting-name" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="请输入姓名">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">学号</label>
+                    <input type="text" id="setting-id" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all" placeholder="请输入学号">
+                </div>
+            </div>
+            <div class="mt-6 flex gap-3">
+                <button onclick="app.toggleSettings()" class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium">取消</button>
+                <button onclick="app.saveSettings()" class="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">保存</button>
+            </div>
+        </div>
     </div>
 
     <script>
         const DATA_DIR = './data';
-        let sidebarCollapsed = false;
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const icon = document.getElementById('toggle-icon');
-            sidebarCollapsed = !sidebarCollapsed;
-            sidebar.classList.toggle('collapsed', sidebarCollapsed);
-            icon.classList.toggle('fa-chevron-right', sidebarCollapsed);
-            icon.classList.toggle('fa-chevron-left', !sidebarCollapsed);
+        
+        // Generate Watermark
+        function initWatermark(name = "李雪瑜", id = "202517040227") {
+            const container = document.getElementById('watermark-layer');
+            const text = `${name}<br>${id}`;
+            let html = '';
+            // Create a larger number of items to ensure full coverage
+            for(let i=0; i<100; i++) {
+                html += `<div class="watermark-item">${text}</div>`;
+            }
+            container.innerHTML = html;
         }
 
         const app = {
             data: {
                 subjects: [],
                 chapters: [],
-                userData: { mistakes: [] },
                 currentSubject: null,
                 currentQuestions: [],
                 currentIndex: 0,
-                currentMode: 'subjects',
-                currentTitle: '',
-                currentAnswer: [],
-                isSubmitted: false
+                currentAnswer: [], // current question selected options
+                answersMap: {}, // map of question index -> array of selected options
+                mistakes: [],
+                startTime: null,
+                timerInterval: null,
+                // User Settings
+                userName: "李雪瑜",
+                userId: "202517040227"
             },
 
             async init() {
-                this.loadLocalData();
+                this.loadSettings();
+                initWatermark(this.data.userName, this.data.userId);
+                this.updateUserInfoUI();
                 await this.loadSubjects();
-                this.updateMistakesCount();
+                // Load persisted data if any
+                const saved = localStorage.getItem('tiku_progress');
+                if(saved) {
+                   try {
+                       const parsed = JSON.parse(saved);
+                       this.data.mistakes = parsed.mistakes || [];
+                   } catch(e){}
+                }
             },
 
-            loadLocalData() {
-                const s = localStorage.getItem('quiz_ultimate_data');
-                if(s) try { this.data.userData = JSON.parse(s); } catch(e){}
+            loadSettings() {
+                const s = localStorage.getItem('tiku_user_settings');
+                if (s) {
+                    try {
+                        const parsed = JSON.parse(s);
+                        this.data.userName = parsed.name || "李雪瑜";
+                        this.data.userId = parsed.id || "202517040227";
+                    } catch(e) {}
+                }
             },
 
-            saveLocalData() {
-                localStorage.setItem('quiz_ultimate_data', JSON.stringify(this.data.userData));
+            saveSettings() {
+                const nameInput = document.getElementById('setting-name').value.trim();
+                const idInput = document.getElementById('setting-id').value.trim();
+                
+                if (nameInput) this.data.userName = nameInput;
+                if (idInput) this.data.userId = idInput;
+
+                localStorage.setItem('tiku_user_settings', JSON.stringify({
+                    name: this.data.userName,
+                    id: this.data.userId
+                }));
+
+                this.updateUserInfoUI();
+                initWatermark(this.data.userName, this.data.userId);
+                this.toggleSettings();
             },
 
-            saveSession() {
-                if (['subjects', 'chapters'].includes(this.data.currentMode)) return;
-                const session = {
-                    mode: this.data.currentMode,
-                    subject: this.data.currentSubject,
-                    title: this.data.currentTitle,
-                    questions: this.data.currentQuestions,
-                    index: this.data.currentIndex,
-                    timestamp: Date.now()
-                };
-                localStorage.setItem('quiz_resume_session', JSON.stringify(session));
+            toggleSettings() {
+                const modal = document.getElementById('settings-modal');
+                if (modal.classList.contains('hidden')) {
+                    // Open
+                    document.getElementById('setting-name').value = this.data.userName;
+                    document.getElementById('setting-id').value = this.data.userId;
+                    modal.classList.remove('hidden');
+                } else {
+                    // Close
+                    modal.classList.add('hidden');
+                }
             },
 
-            loadSession() {
-                try { return JSON.parse(localStorage.getItem('quiz_resume_session')); } catch { return null; }
+            updateUserInfoUI() {
+                const info = `${this.data.userName} (${this.data.userId})`;
+                // Update Default Layout Header
+                const el1 = document.getElementById('user-info');
+                if(el1) el1.innerText = info;
+                
+                // Update Quiz Layout Header (requires finding the element, as it doesn't have an ID in previous code, need to fix that or use querySelector)
+                // In my previous edits, I didn't give the quiz header text a specific ID, it was just inside the div. 
+                // Let's rely on a selector or add an ID in a separate step? 
+                // Actually, I can target it via the header structure.
+                const quizHeaderTitle = document.querySelector('#quiz-ui header .flex-1');
+                if(quizHeaderTitle) quizHeaderTitle.innerText = info;
             },
-
-            clearSession() { localStorage.removeItem('quiz_resume_session'); },
 
             async loadSubjects() {
                 try {
-                    const res = await fetch(`${DATA_DIR}/subjects.json?t=${Date.now()}`);
-                    if (!res.ok) { this.renderEmpty("未检测到学科数据。<br>请运行 manage_data.py 导入。"); return; }
+                    const res = await fetch(`${DATA_DIR}/subjects.json`);
                     this.data.subjects = await res.json();
                     this.renderSubjectList();
-                    this.renderSubjectsInSidebar();
-                } catch (e) { this.renderEmpty("加载失败：" + e.message); }
+                } catch(e) {
+                    document.getElementById('main-container').innerHTML = `<div class="p-8 text-center text-gray-400">加载失败，请检查 data 目录</div>`;
+                }
             },
 
             async loadChapters(subject) {
                 this.data.currentSubject = subject;
-                this.renderLoading("正在获取章节...");
+                const container = document.getElementById('main-container');
+                container.innerHTML = '<div class="p-8 text-center"><i class="fa-solid fa-spinner fa-spin text-blue-500"></i></div>';
+                
                 try {
-                    const res = await fetch(`${DATA_DIR}/${subject.dir}/index.json?t=${Date.now()}`);
-                    if (!res.ok) throw new Error("无数据");
+                    const res = await fetch(`${DATA_DIR}/${subject.dir}/index.json`);
                     this.data.chapters = await res.json();
                     this.renderChapterList();
-                    this.renderChaptersInSidebar();
-                } catch (e) {
-                    this.data.chapters = [];
-                    this.renderChapterList();
-                    this.renderChaptersInSidebar();
-                }
-            },
-
-            async loadQuiz(chapterFile, title) {
-                this.clearSession();
-                this.renderLoading("正在加载题目...");
-                try {
-                    const res = await fetch(`${DATA_DIR}/${this.data.currentSubject.dir}/${chapterFile}?t=${Date.now()}`);
-                    const data = await res.json();
-                    const qList = Array.isArray(data) ? data : (data.questions || []);
-                    if(qList.length === 0) throw new Error("空章节");
-                    this.startQuiz(qList, title, 'quiz');
                 } catch(e) {
-                    alert("加载失败: " + e.message);
-                    this.renderChapterList();
+                    this.renderChapterList([]); // Empty
                 }
             },
 
-            async startMockExam() {
-                this.clearSession();
-                this.renderLoading("正在从题库抽题组卷...");
+            async startQuiz(chapterFile, title) {
                 try {
-                    if (!this.data.chapters || this.data.chapters.length === 0) throw new Error("该学科无题库");
-                    const promises = this.data.chapters.map(ch => 
-                        fetch(`${DATA_DIR}/${this.data.currentSubject.dir}/${ch.file}?t=${Date.now()}`)
-                            .then(r => r.json())
-                            .then(d => Array.isArray(d) ? d : (d.questions || []))
-                            .catch(() => [])
-                    );
-                    const results = await Promise.all(promises);
-                    let allQ = results.flat();
-                    if (allQ.length === 0) throw new Error("题库为空");
-                    for (let i = allQ.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [allQ[i], allQ[j]] = [allQ[j], allQ[i]];
-                    }
-                    const examQ = allQ.slice(0, 30);
-                    this.startQuiz(examQ, `模拟考试 (${examQ.length}题)`, 'exam');
-                } catch (e) {
-                    alert("组卷失败: " + e.message);
-                    this.renderChapterList();
+                    const res = await fetch(`${DATA_DIR}/${this.data.currentSubject.dir}/${chapterFile}`);
+                    let questions = await res.json();
+                    if(questions.questions) questions = questions.questions;
+                    
+                    this.data.currentQuestions = questions;
+                    this.data.currentIndex = 0;
+                    this.data.answersMap = {};
+                    this.data.startTime = Date.now();
+                    
+                    this.enterQuizMode();
+                    this.startTimer();
+                    this.renderQuestion();
+                } catch(e) {
+                    alert("题目加载失败");
                 }
             },
+
+            // --- UI Rendering ---
 
             renderSubjectList() {
-                this.data.currentMode = 'subjects';
-                this.data.currentSubject = null;
-                document.getElementById('quiz-footer').classList.add('hidden');
-                document.getElementById('palette-panel').classList.add('hidden');
-                document.getElementById('header-status').innerText = '学科列表';
-                document.getElementById('chapters-section').classList.add('hidden');
-                document.getElementById('exam-section').classList.add('hidden');
-                document.getElementById('subjects-section').classList.add('hidden');
-                document.getElementById('back-to-home').classList.add('hidden');
-
-                const resumeData = this.loadSession();
-                if (resumeData && resumeData.index < resumeData.questions.length) {
-                    document.getElementById('resume-section').classList.remove('hidden');
-                    document.getElementById('resume-title').innerText = resumeData.title;
-                } else {
-                    document.getElementById('resume-section').classList.add('hidden');
-                }
-
-                const container = document.getElementById('main-container');
-                let html = `<div class="p-4 space-y-5 animate-fade-in max-w-xl mx-auto">`;
-                if (this.data.subjects.length === 0) {
-                    html += `<div class="p-8 text-center border-2 border-dashed rounded-xl text-gray-400 text-sm">暂无数据<br>请运行 manage_data.py</div>`;
-                }
-                this.data.subjects.forEach(sub => {
-                    html += `
-                        <div onclick='app.loadChapters(${JSON.stringify(sub)})' class="subject-card p-5 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between cursor-pointer">
-                            <div class="flex items-center gap-4">
-                                <div class="w-12 h-12 rounded-xl bg-gray-50 text-gray-600 flex items-center justify-center text-xl">
-                                    <i class="fa-solid fa-folder"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-gray-800 text-lg">${sub.name}</h3>
-                                    <p class="text-xs text-gray-400">点击进入</p>
-                                </div>
-                            </div>
-                            <i class="fa-solid fa-chevron-right text-gray-300"></i>
+                document.getElementById('header-title').innerText = "学科选择";
+                const html = this.data.subjects.map(s => `
+                    <div onclick='app.loadChapters(${JSON.stringify(s)})' class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between mb-3 cursor-pointer active:scale-98 transition-transform">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center"><i class="fa-solid fa-book"></i></div>
+                            <span class="font-bold text-gray-700">${s.name}</span>
                         </div>
-                    `;
-                });
-                html += `</div>`;
-                container.innerHTML = html;
+                        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+                    </div>
+                `).join('');
+                document.getElementById('main-container').innerHTML = html;
             },
 
             renderChapterList() {
-                this.data.currentMode = 'chapters';
-                const subName = this.data.currentSubject.name;
-                document.getElementById('header-status').innerHTML = `<span onclick="app.renderSubjectList()" class="cursor-pointer hover:text-indigo-600">学科</span> > ${subName}`;
-                document.getElementById('chapters-section').classList.remove('hidden');
-                document.getElementById('exam-section').classList.remove('hidden');
-                document.getElementById('subjects-section').classList.add('hidden');
-                document.getElementById('back-to-home').classList.remove('hidden');
-
-                const container = document.getElementById('main-container');
-                let html = `<div class="p-4 space-y-4 animate-fade-in max-w-xl mx-auto">`;
-
-                html += `
-                    <div onclick="app.renderSubjectList()" class="text-sm text-gray-500 hover:text-indigo-600 flex items-center gap-1 cursor-pointer">
-                        <i class="fa-solid fa-arrow-left"></i> 返回学科列表
-                    </div>
-                    <div onclick="app.startMockExam()" class="bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl p-5 text-white cursor-pointer shadow-lg">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-xl">
-                                <i class="fa-solid fa-stopwatch"></i>
-                            </div>
+                document.getElementById('header-title').innerText = this.data.currentSubject.name;
+                const html = `
+                    <div onclick="app.renderSubjectList()" class="mb-4 text-blue-500 text-sm flex items-center gap-1 cursor-pointer"><i class="fa-solid fa-arrow-left"></i> 返回学科</div>
+                    ${this.data.chapters.map(c => `
+                        <div onclick="app.startQuiz('${c.file}', '${c.title}')" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between mb-3 cursor-pointer">
                             <div>
-                                <h3 class="font-bold text-lg">全真模拟考试</h3>
-                                <p class="text-sm text-orange-100">从全科题库中随机抽取 30 题</p>
+                                <div class="font-bold text-gray-800 text-sm mb-1">${c.title}</div>
+                                <div class="text-xs text-gray-400">共 ${c.count} 题</div>
                             </div>
+                            <div class="px-3 py-1 bg-blue-50 text-blue-600 text-xs rounded-full">开始</div>
                         </div>
-                    </div>
+                    `).join('')}
                 `;
+                document.getElementById('main-container').innerHTML = html;
+            },
 
-                html += `<div class="flex items-center gap-2 text-lg font-bold text-gray-800 mt-4"><i class="fa-solid fa-folder-open text-indigo-500"></i> 章节练习</div>`;
+            enterQuizMode() {
+                document.body.classList.add('quiz-mode');
+            },
 
-                if (this.data.chapters.length === 0) {
-                    html += `<div class="text-center py-10 text-gray-400">该学科下暂无章节</div>`;
-                } else {
-                    this.data.chapters.forEach(ch => {
-                        html += `
-                            <div onclick="app.loadQuiz('${ch.file}', '${ch.title}')" class="chapter-item bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                                        ${ch.title.match(/\d+/) ? ch.title.match(/\d+/)[0] : 'Q'}
-                                    </div>
-                                    <div>
-                                        <div class="font-bold text-gray-700">${ch.title}</div>
-                                        <div class="text-xs text-gray-400">${ch.count} 题</div>
-                                    </div>
-                                </div>
-                                <i class="fa-solid fa-play text-gray-200"></i>
-                            </div>
-                        `;
-                    });
+            exitQuiz() {
+                if(confirm("确定退出练习吗？进度将不会保存。")) {
+                    document.body.classList.remove('quiz-mode');
+                    clearInterval(this.data.timerInterval);
+                    this.renderChapterList();
                 }
-                html += `</div>`;
-                container.innerHTML = html;
             },
 
-            renderSubjectsInSidebar() {
-                const list = document.getElementById('subjects-list');
-                list.innerHTML = this.data.subjects.map(sub => `
-                    <div onclick='app.loadChapters(${JSON.stringify(sub)})' class="subject-item p-3 rounded-lg hover:bg-gray-50 flex items-center justify-between">
-                        <span class="font-medium text-gray-700">${sub.name}</span>
-                        <i class="fa-solid fa-chevron-right text-gray-300 text-xs"></i>
-                    </div>
-                `).join('');
-            },
-
-            renderChaptersInSidebar() {
-                const list = document.getElementById('chapters-list');
-                list.innerHTML = this.data.chapters.map(ch => `
-                    <div onclick="app.loadQuiz('${ch.file}', '${ch.title}')" class="chapter-item p-3 rounded-lg hover:bg-gray-50 flex items-center justify-between">
-                        <span class="font-medium text-gray-700">${ch.title}</span>
-                        <span class="text-xs text-gray-400">${ch.count}题</span>
-                    </div>
-                `).join('');
-            },
-
-            resumeQuiz() {
-                const session = this.loadSession();
-                if (!session) { alert("进度已失效"); this.renderSubjectList(); return; }
-                this.data.currentSubject = session.subject;
-                this.startQuiz(session.questions, session.title, session.mode, true);
-                this.data.currentIndex = session.index;
-                this.renderQuestion();
-            },
-
-            startMistakeMode() {
-                if (this.data.userData.mistakes.length === 0) { alert("没有错题！"); return; }
-                this.clearSession();
-                this.startQuiz(this.data.userData.mistakes, "错题突击", 'mistake');
-            },
-
-            updateMistakesCount() {
-                const count = this.data.userData.mistakes.length;
-                document.getElementById('mistakes-count').innerText = count > 0 ? `共 ${count} 题` : '暂无错题';
-            },
-
-            startQuiz(questions, title, mode, isResume=false) {
-                this.data.currentQuestions = questions;
-                this.data.currentMode = mode;
-                this.data.currentTitle = title;
-                if (!isResume) this.data.currentIndex = 0;
+            startTimer() {
+                clearInterval(this.data.timerInterval);
+                const timerEl = document.getElementById('timer-display');
+                let totalSeconds = 40 * 60; // 40 minutes
                 
-                const prefix = this.data.currentSubject ? this.data.currentSubject.name : '练习';
-                document.getElementById('header-status').innerText = `${prefix} > ${title}`;
-                document.getElementById('quiz-footer').classList.remove('hidden');
-                document.getElementById('chapters-section').classList.remove('hidden');
-                document.getElementById('exam-section').classList.remove('hidden');
-                
-                this.resetQuestionState();
-                if(!isResume) this.renderQuestion();
+                const updateDisplay = () => {
+                    const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+                    const s = (totalSeconds % 60).toString().padStart(2, '0');
+                    timerEl.innerText = `${m}' ${s}"`;
+                    if (totalSeconds <= 0) {
+                        clearInterval(this.data.timerInterval);
+                        alert("时间到！系统已自动提交。");
+                        this.showResult();
+                    }
+                    totalSeconds--;
+                };
+
+                updateDisplay();
+                this.data.timerInterval = setInterval(updateDisplay, 1000);
             },
 
-            resetQuestionState() {
-                this.data.currentAnswer = [];
-                this.data.isSubmitted = false;
-            },
+            // --- Core Quiz Logic ---
 
             renderQuestion() {
                 const q = this.data.currentQuestions[this.data.currentIndex];
-                if (!q) return;
+                const total = this.data.currentQuestions.length;
+                
+                // 1. Update Progress
+                document.getElementById('progress-text').innerText = `${this.data.currentIndex + 1}/${total}`;
+                const pct = ((this.data.currentIndex + 1) / total) * 100;
+                document.getElementById('progress-bar').style.width = `${pct}%`;
 
-                document.getElementById('current-idx').innerText = this.data.currentIndex + 1;
-                document.getElementById('total-count').innerText = this.data.currentQuestions.length;
+                // 2. Update Header Info
+                document.getElementById('q-number').innerText = `${this.data.currentIndex + 1}.`;
+                document.getElementById('q-text').innerText = q.question;
 
-                const container = document.getElementById('main-container');
-                const isMulti = q.type === '多选题';
-                const answered = this.data.currentAnswer.length > 0;
-                const answeredSet = new Set(this.data.currentAnswer);
+                // 3. Update Question Type Info
+                const isMulti = q.type === "多选题";
+                const typeText = isMulti ? "多选题" : "单选题";
+                // Mocking score logic as requested by image style
+                const scoreText = isMulti ? "2.0分" : "1.0分"; 
+                const totalScore = total * (isMulti ? 2 : 1); // rough estimate
+                
+                document.getElementById('q-type-title').innerText = `${typeText} (共${total}题，${totalScore}.0分)`;
+                document.getElementById('q-type-desc').innerText = isMulti 
+                    ? `题型说明: 每小题2分。下列每题给出的选项中，至少有两个选项符合题目要求。多选、少选、错选均不得分。`
+                    : `题型说明: 每小题1分。下列每题给出的四个选项中，只有一个选项是符合题目要求的。`;
 
+                // 4. Render Options
+                const currentAnswer = this.data.answersMap[this.data.currentIndex] || [];
+                // Check if we should show result (if answered)
+                // For this UI, let's assume "Practice Mode" where we show result immediately after interaction?
+                // Or "Exam Mode"? The image looks like an exam or practice. 
+                // Let's implement immediate feedback style similar to common apps:
+                // If answered, show color. If not, show plain.
+                
+                // Wait, typical "Next" button flow implies we select then confirm? 
+                // Or instant click?
+                // The image shows "Next Question" button. Usually means select -> next. 
+                // But let's look at the options. 
+                
+                const optionsContainer = document.getElementById('q-options');
                 let optionsHtml = '';
-                if (q.options) {
-                    const optKeys = Object.keys(q.options);
-                    optKeys.forEach(key => {
-                        const isSelected = answeredSet.has(key);
-                        const isCorrect = q.answer.includes(key);
-                        let bgClass = 'bg-white border-gray-200';
-                        let icon = '';
-                        
-                        if (this.data.isSubmitted) {
-                            if (isCorrect) {
-                                bgClass = 'bg-green-50 border-green-300';
-                                icon = '<i class="fa-solid fa-check text-green-500"></i>';
-                            } else if (isSelected && !isCorrect) {
-                                bgClass = 'bg-red-50 border-red-300';
-                                icon = '<i class="fa-solid fa-times text-red-500"></i>';
-                            } else if (isCorrect) {
-                                bgClass = 'bg-green-50 border-green-300';
-                            }
-                        } else if (isSelected) {
-                            bgClass = 'bg-indigo-50 border-indigo-400';
-                            icon = '<i class="fa-solid fa-check text-indigo-500"></i>';
-                        }
-
-                        optionsHtml += `
-                            <div onclick="app.selectOption('${key}')" data-option="${key}" class="option-card flex items-start gap-3 p-4 rounded-xl border-2 ${bgClass}">
-                                <div class="option-icon w-8 h-8 rounded-lg border border-current flex items-center justify-center flex-shrink-0 ${isSelected ? 'border-indigo-400 bg-indigo-100 text-indigo-600' : 'border-gray-300 text-gray-400'}">
-                                    ${icon || `<span class="font-bold">${key}</span>`}
-                                </div>
-                                <div class="flex-1 pt-1">
-                                    <span class="text-gray-800">${q.options[key]}</span>
-                                </div>
-                            </div>
-                        `;
-                    });
-                }
-
-                let html = `
-                    <div class="max-w-3xl mx-auto animate-fade-in">
-                        <div class="mb-6">
-                            <div class="flex items-center gap-2 mb-3">
-                                <span class="px-2 py-1 text-xs font-bold rounded-lg ${isMulti ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}">${q.type}</span>
-                                <span class="text-sm text-gray-400">${q.chapter || ''}</span>
-                            </div>
-                            <h2 class="text-xl font-bold text-gray-800 leading-relaxed">${this.data.currentIndex + 1}. ${q.question}</h2>
-                            ${isMulti ? '<p class="text-sm text-gray-500 mt-2">多选题，请选择全部正确答案</p>' : ''}
-                        </div>
-                        <div class="space-y-3">${optionsHtml}</div>
-                    </div>
-                `;
-
-                container.innerHTML = html;
-                this.renderPalette();
-                this.renderFooterButtons(isMulti);
-            },
-
-            renderPalette() {
-                if (window.innerWidth < 1024) return;
                 
-                const palette = document.getElementById('question-palette');
-                const panel = document.getElementById('palette-panel');
-                panel.classList.add('hidden');
+                // Normalize options (handle array or object)
+                let opts = q.options;
+                // If it's an object {A:..., B:...}
                 
-                const correctIds = new Set();
-                const wrongIds = new Set();
-                const answeredIds = new Set();
-                
-                this.data.currentQuestions.forEach((q, idx) => {
-                    const sessionKey = `q_${this.data.currentSubject?.dir}_${q.id}`;
-                    const isAnswered = this.data.userData.mistakes.some(m => m.id === q.id);
-                    if (isAnswered && !answeredIds.has(idx)) {
-                        wrongIds.add(idx);
-                    }
-                });
-                
-                palette.innerHTML = this.data.currentQuestions.map((q, idx) => {
-                    let classes = 'bg-white border border-gray-200 text-gray-600';
-                    if (idx === this.data.currentIndex) {
-                        classes = 'bg-indigo-600 text-white ring-2 ring-indigo-300 ring-offset-2';
-                    } else if (wrongIds.has(idx)) {
-                        classes = 'bg-red-100 border-red-200 text-red-600';
-                    } else if (idx < this.data.currentIndex) {
-                        classes = 'bg-green-100 border-green-200 text-green-600';
-                    }
-                    return `<div onclick="app.goToQuestion(${idx})" class="palette-btn ${classes}">${idx + 1}</div>`;
-                }).join('');
-            },
-
-            togglePalette() {
-                const panel = document.getElementById('palette-panel');
-                panel.classList.toggle('hidden');
-            },
-
-            renderFooterButtons(isMulti) {
-                const area = document.getElementById('action-btn-area');
-                if (this.data.isSubmitted) {
-                    const isLast = this.data.currentIndex === this.data.currentQuestions.length - 1;
-                    area.innerHTML = `
-                        <button onclick="app.nextQuestion()" class="px-6 py-2 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition-colors">
-                            ${isLast ? '完成' : '下一题'} <i class="fa-solid fa-arrow-right ml-1"></i>
-                        </button>
-                    `;
-                } else {
-                    const canSubmit = this.data.currentAnswer.length > 0;
-                    area.innerHTML = `
-                        <button onclick="app.submitAnswer()" ${!canSubmit ? 'disabled' : ''} class="px-6 py-2 rounded-lg font-medium transition-colors ${canSubmit ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}">
-                            提交答案 <i class="fa-solid fa-check ml-1"></i>
-                        </button>
-                    `;
-                }
-            },
-
-            selectOption(key) {
-                if (this.data.isSubmitted) return;
-                const idx = this.data.currentAnswer.indexOf(key);
-                const q = this.data.currentQuestions[this.data.currentIndex];
-                const isMulti = q.type === '多选题';
-                
-                if (idx > -1) {
-                    this.data.currentAnswer.splice(idx, 1);
-                } else {
-                    if (isMulti) {
-                        this.data.currentAnswer.push(key);
-                    } else {
-                        this.data.currentAnswer = [key];
-                    }
-                }
-                this.updateOptionStyles();
-                this.renderFooterButtons(isMulti);
-            },
-
-            updateOptionStyles() {
-                const q = this.data.currentQuestions[this.data.currentIndex];
-                const answeredSet = new Set(this.data.currentAnswer);
-                const optKeys = Object.keys(q.options);
-                const isMulti = q.type === '多选题';
-                
-                optKeys.forEach(key => {
-                    const isSelected = answeredSet.has(key);
-                    const optionCard = document.querySelector(`[data-option="${key}"]`);
-                    if (!optionCard) return;
+                Object.keys(opts).forEach(key => {
+                    const val = opts[key];
+                    const isSelected = currentAnswer.includes(key);
                     
-                    const iconContainer = optionCard.querySelector('.option-icon');
-                    if (!iconContainer) return;
+                    // Style determination
+                    // In this specific UI, we just highlight selected. 
+                    // Verification happens? The image doesn't explicitly show right/wrong state.
+                    // But usually, if it's "Practice", it shows. 
+                    // Let's toggle selection state visually first.
                     
-                    optionCard.classList.remove('bg-indigo-50', 'border-indigo-400');
-                    optionCard.classList.add('bg-white', 'border-gray-200');
-                    
-                    iconContainer.classList.remove('border-indigo-400', 'bg-indigo-100', 'text-indigo-600');
-                    iconContainer.classList.add('border-gray-300', 'text-gray-400');
-                    iconContainer.innerHTML = `<span class="font-bold">${key}</span>`;
+                    let cardClass = "quiz-option-card";
+                    let letterClass = "font-bold text-gray-700 text-lg mr-4 w-6";
                     
                     if (isSelected) {
-                        optionCard.classList.remove('bg-white', 'border-gray-200');
-                        optionCard.classList.add('bg-indigo-50', 'border-indigo-400');
-                        
-                        iconContainer.classList.remove('border-gray-300', 'text-gray-400');
-                        iconContainer.classList.add('border-indigo-400', 'bg-indigo-100', 'text-indigo-600');
-                        iconContainer.innerHTML = `<i class="fa-solid fa-check"></i>`;
+                        cardClass += " selected";
+                        letterClass = "font-bold text-blue-600 text-lg mr-4 w-6";
                     }
+
+                    optionsHtml += `
+                        <div onclick="app.toggleOption('${key}')" class="${cardClass}">
+                            <div class="${letterClass}">${key}</div>
+                            <div class="text-gray-700 text-base leading-relaxed pt-0.5">${val}</div>
+                        </div>
+                    `;
                 });
+                optionsContainer.innerHTML = optionsHtml;
+
+                // Update Next Button Text
+                const nextBtn = document.getElementById('next-btn-text');
+                nextBtn.innerText = (this.data.currentIndex === total - 1) ? "提交试卷" : "下一题";
             },
 
-            submitAnswer() {
-                if (this.data.currentAnswer.length === 0) return;
-                this.data.isSubmitted = true;
+            toggleOption(key) {
                 const q = this.data.currentQuestions[this.data.currentIndex];
-                const isCorrect = q.answer.length === this.data.currentAnswer.length && q.answer.every(a => this.data.currentAnswer.includes(a));
+                const isMulti = q.type === "多选题";
                 
-                if (!isCorrect) {
-                    if (!this.data.userData.mistakes.some(m => m.id === q.id)) {
-                        this.data.userData.mistakes.push(q);
-                        this.saveLocalData();
-                        this.updateMistakesCount();
-                    }
+                let ans = this.data.answersMap[this.data.currentIndex] || [];
+                
+                if (isMulti) {
+                    if (ans.includes(key)) ans = ans.filter(k => k !== key);
+                    else ans.push(key);
+                } else {
+                    // Single choice: toggle off if same, switch if diff
+                    if (ans.includes(key)) ans = []; 
+                    else ans = [key];
                 }
-                this.renderQuestion();
+                
+                this.data.answersMap[this.data.currentIndex] = ans;
+                this.renderQuestion(); // Re-render to update styles
             },
 
-            nextQuestion() {
-                if (this.data.currentIndex < this.data.currentQuestions.length - 1) {
+            nextQuestionOrSubmit() {
+                const total = this.data.currentQuestions.length;
+                if (this.data.currentIndex < total - 1) {
                     this.data.currentIndex++;
-                    this.resetQuestionState();
                     this.renderQuestion();
                 } else {
-                    const mode = this.data.currentMode;
-                    if (mode === 'exam') {
-                        if(confirm("考试结束！返回章节列表？")) this.renderChapterList();
-                    } else if(confirm("练习结束，返回章节列表？")) this.renderChapterList();
-                    else this.renderSubjectList();
+                    // Submit
+                    if(confirm("确定提交试卷吗？")) {
+                        this.showResult();
+                    }
                 }
-                this.saveSession();
             },
 
             prevQuestion() {
                 if (this.data.currentIndex > 0) {
                     this.data.currentIndex--;
-                    this.resetQuestionState();
                     this.renderQuestion();
-                    this.saveSession();
                 }
             },
 
-            goToQuestion(idx) {
-                this.data.currentIndex = idx;
-                this.resetQuestionState();
+            togglePalette() {
+                const p = document.getElementById('palette-modal');
+                const isOpen = !p.classList.contains('hidden');
+                
+                if (isOpen) {
+                    p.classList.add('hidden');
+                } else {
+                    // Render Palette Content
+                    const grid = document.getElementById('palette-grid');
+                    grid.innerHTML = this.data.currentQuestions.map((q, i) => {
+                        const isAns = this.data.answersMap[i] && this.data.answersMap[i].length > 0;
+                        const isCurrent = i === this.data.currentIndex;
+                        let cls = "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold border ";
+                        
+                        if (isCurrent) cls += "border-blue-500 text-blue-500 bg-white ring-2 ring-blue-100";
+                        else if (isAns) cls += "bg-blue-500 border-blue-500 text-white";
+                        else cls += "border-gray-200 text-gray-500 bg-white";
+                        
+                        return `<div onclick="app.jumpTo(${i})" class="${cls}">${i+1}</div>`;
+                    }).join('');
+                    
+                    p.classList.remove('hidden');
+                }
+            },
+            
+            jumpTo(i) {
+                this.data.currentIndex = i;
                 this.renderQuestion();
-                this.saveSession();
+                this.togglePalette();
             },
 
-            renderLoading(msg="资源加载中...") {
-                document.getElementById('main-container').innerHTML = `
-                    <div class="flex h-full flex-col items-center justify-center text-gray-400">
-                        <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-indigo-500"></i>
-                        <p>${msg}</p>
-                    </div>
-                `;
-            },
-
-            renderEmpty(msg) {
-                document.getElementById('main-container').innerHTML = `
-                    <div class="h-full flex flex-col items-center justify-center text-center p-6 text-gray-400">
-                        <i class="fa-solid fa-box-open text-4xl mb-4 text-gray-300"></i>
-                        <p class="text-sm">${msg}</p>
-                    </div>
-                `;
+            showResult() {
+                alert("考试结束！(结果页面待开发)");
+                this.exitQuiz();
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => app.init());
+        document.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
     </script>
 </body>
 </html>
