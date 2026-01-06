@@ -122,7 +122,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body class="bg-gray-100 h-screen text-gray-800">
+<body class="bg-gray-100 h-screen text-gray-800 text-[14px]">
 
     <!-- Watermark Container (Always present but visible based on context) -->
     <div class="watermark-container" id="watermark-layer"></div>
@@ -131,7 +131,7 @@
     <div class="app-layout" id="default-ui">
         <!-- Sidebar (Desktop) -->
         <aside class="sidebar">
-            <div class="p-5 border-b border-gray-100 font-bold text-lg flex items-center gap-2">
+            <div class="p-5 border-b border-gray-100 font-bold text-base flex items-center gap-2">
                 <i class="fa-solid fa-layer-group text-indigo-600"></i> 刷题宝 Ultimate
             </div>
             <div class="flex-1 overflow-y-auto p-4 space-y-4">
@@ -148,10 +148,10 @@
         <!-- Main Content -->
         <main class="main-content">
             <div class="p-4 bg-white border-b border-gray-200 flex justify-between items-center sticky top-0 z-20">
-                <div id="header-title" class="font-bold text-lg">刷题宝</div>
+                <div id="header-title" class="font-bold text-base">刷题宝</div>
                 <div class="flex items-center gap-3" onclick="app.toggleSettings()">
-                    <div id="user-info" class="text-sm text-gray-500 cursor-pointer">[姓名] ([学号])</div>
-                    <i class="fa-solid fa-cog text-gray-400 cursor-pointer text-lg"></i>
+                    <div id="user-info" class="text-xs text-gray-500 cursor-pointer">[姓名] ([学号])</div>
+                    <i class="fa-solid fa-cog text-gray-400 cursor-pointer text-base"></i>
                 </div>
             </div>
             
@@ -164,30 +164,30 @@
     <!-- 2. Quiz Mode UI (Replicating the Image) -->
     <div id="quiz-ui" class="bg-white">
         <!-- Header -->
-        <header class="h-14 flex items-center px-4 bg-white border-b border-gray-100 flex-shrink-0 z-20 relative">
+        <header class="h-12 flex items-center px-4 bg-white border-b border-gray-100 flex-shrink-0 z-20 relative">
             <button onclick="app.exitQuiz()" class="w-10 h-10 flex items-center justify-start text-gray-600">
-                <i class="fa-solid fa-chevron-left text-xl"></i>
+                <i class="fa-solid fa-chevron-left text-lg"></i>
             </button>
-            <div class="flex-1 text-center font-medium text-lg text-gray-800">[姓名] ([学号])</div>
+            <div class="flex-1 text-center font-medium text-[16px] text-gray-800">[姓名] ([学号])</div>
             <div class="w-10"></div> <!-- Spacer -->
         </header>
 
         <!-- Info Bar -->
-        <div class="flex items-center justify-between px-4 py-3 bg-white z-20 relative">
-            <div class="flex items-center gap-2 text-gray-600 text-sm">
+        <div class="flex items-center justify-between px-4 py-2 bg-white z-20 relative">
+            <div class="flex items-center gap-1 text-gray-600 text-xs">
                 <i class="fa-regular fa-clock text-gray-400"></i>
                 <span id="timer-display">00' 00"</span>
             </div>
             
-            <div class="flex items-center gap-3 flex-1 mx-4">
-                <span class="text-gray-600 text-sm" id="progress-text">1/10</span>
-                <div class="flex-1 progress-track bg-gray-100 rounded-full h-1.5">
+            <div class="flex items-center gap-2 flex-1 mx-4">
+                <span class="text-gray-600 text-xs" id="progress-text">1/10</span>
+                <div class="flex-1 progress-track bg-gray-100 rounded-full h-1">
                     <div id="progress-bar" class="progress-fill rounded-full" style="width: 0%"></div>
                 </div>
             </div>
 
             <div onclick="app.togglePalette()" class="flex flex-col items-center text-gray-600 cursor-pointer">
-                <i class="fa-regular fa-newspaper text-lg mb-0.5"></i>
+                <i class="fa-regular fa-newspaper text-base mb-0.5"></i>
                 <span class="text-[10px]">答题卡</span>
             </div>
         </div>
@@ -196,17 +196,17 @@
         <div class="flex-1 overflow-y-auto relative z-10" id="quiz-content">
             <div class="p-4 pb-24">
                 <!-- Question Type Description -->
-                <div class="mb-6">
-                    <h2 class="text-lg font-bold text-gray-800 mb-2" id="q-type-title">单选题 (共36题，36.0分)</h2>
-                    <p class="text-sm text-gray-400 leading-relaxed text-justify" id="q-type-desc">
+                <div class="mb-4">
+                    <h2 class="text-[15px] font-bold text-gray-800 mb-1" id="q-type-title">单选题 (共36题，36.0分)</h2>
+                    <p class="text-xs text-gray-400 leading-relaxed text-justify" id="q-type-desc">
                         题型说明: 1-36小题，每小题1分，共36分。下列每题给出的四个选项中，只有一个选项是符合题目要求的，请选出正确答案。多选、错选、不选均不得分
                     </p>
                 </div>
 
                 <!-- Question Text -->
-                <div class="mb-8">
-                    <div class="text-lg text-gray-800 leading-relaxed font-medium">
-                        <span id="q-number">2.</span> <span class="text-gray-500 text-base font-normal">(1.0分)</span> 
+                <div class="mb-6">
+                    <div class="text-[15px] text-gray-800 leading-relaxed font-medium">
+                        <span id="q-number">2.</span> <span class="text-gray-500 text-xs font-normal">(1.0分)</span> 
                         <span id="q-text">个人对社会的责任与贡献属于( )</span>
                     </div>
                 </div>
@@ -219,13 +219,13 @@
         </div>
 
         <!-- Footer Actions -->
-        <div class="h-14 bg-white border-t border-gray-100 flex items-center fixed bottom-0 left-0 w-full z-30">
-            <button onclick="app.prevQuestion()" class="w-1/3 h-full flex items-center justify-center text-blue-500 text-base font-medium active:bg-gray-50">
+        <div class="bg-white border-t border-gray-100 flex items-center px-6 py-3 fixed bottom-0 left-0 w-full z-30" style="padding-bottom: max(12px, env(safe-area-inset-bottom));">
+            <div onclick="app.prevQuestion()" class="text-blue-500 text-[15px] font-medium mr-6 cursor-pointer active:opacity-70">
                 上一题
-            </button>
-            <button onclick="app.nextQuestionOrSubmit()" id="next-btn-text" class="w-2/3 h-full flex items-center justify-center bg-blue-500 text-white text-base font-medium active:bg-blue-600">
+            </div>
+            <div onclick="app.nextQuestionOrSubmit()" id="next-btn-text" class="flex-1 bg-blue-500 text-white text-[15px] font-medium py-2.5 rounded text-center cursor-pointer active:bg-blue-600 shadow-sm transition-colors">
                 下一题
-            </button>
+            </div>
         </div>
 
         <!-- Answer Card Modal (Palette) -->
@@ -530,17 +530,17 @@
                     // Let's toggle selection state visually first.
                     
                     let cardClass = "quiz-option-card";
-                    let letterClass = "font-bold text-gray-700 text-lg mr-4 w-6";
+                    let letterClass = "font-bold text-gray-700 text-[15px] mr-4 w-6";
                     
                     if (isSelected) {
                         cardClass += " selected";
-                        letterClass = "font-bold text-blue-600 text-lg mr-4 w-6";
+                        letterClass = "font-bold text-blue-600 text-[15px] mr-4 w-6";
                     }
 
                     optionsHtml += `
                         <div onclick="app.toggleOption('${key}')" class="${cardClass}">
                             <div class="${letterClass}">${key}</div>
-                            <div class="text-gray-700 text-base leading-relaxed pt-0.5">${val}</div>
+                            <div class="text-gray-700 text-[14px] leading-relaxed pt-0.5">${val}</div>
                         </div>
                     `;
                 });
