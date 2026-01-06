@@ -173,22 +173,22 @@
         </header>
 
         <!-- Info Bar -->
-        <div class="flex items-center justify-between px-4 py-2 bg-white z-20 relative">
-            <div class="flex items-center gap-1 text-gray-600 text-xs">
-                <i class="fa-regular fa-clock text-gray-400"></i>
-                <span id="timer-display">00' 00"</span>
+        <div class="flex items-center justify-between px-4 py-3 bg-white z-20 relative">
+            <div class="flex items-center gap-1.5 text-gray-600">
+                <i class="fa-regular fa-clock text-lg text-gray-400"></i>
+                <span id="timer-display" class="text-[15px] font-medium tracking-wide">00' 00"</span>
             </div>
             
-            <div class="flex items-center gap-2 flex-1 mx-4">
-                <span class="text-gray-600 text-xs" id="progress-text">1/10</span>
-                <div class="flex-1 progress-track bg-gray-100 rounded-full h-1">
+            <div class="flex items-center gap-3 flex-1 ml-6 mr-4">
+                <span class="text-gray-800 text-[16px] font-medium" id="progress-text">1/10</span>
+                <div class="flex-1 progress-track bg-gray-100 rounded-full h-1.5">
                     <div id="progress-bar" class="progress-fill rounded-full" style="width: 0%"></div>
                 </div>
             </div>
 
-            <div onclick="app.togglePalette()" class="flex flex-col items-center text-gray-600 cursor-pointer">
-                <i class="fa-regular fa-newspaper text-base mb-0.5"></i>
-                <span class="text-[10px]">答题卡</span>
+            <div onclick="app.togglePalette()" class="flex flex-col items-center text-gray-600 cursor-pointer min-w-[40px]">
+                <i class="fa-regular fa-newspaper text-xl mb-0.5"></i>
+                <span class="text-[11px] font-medium">答题卡</span>
             </div>
         </div>
 
