@@ -149,7 +149,10 @@
         <main class="main-content">
             <div class="p-4 bg-white border-b border-gray-200 flex justify-between items-center sticky top-0 z-20">
                 <div id="header-title" class="font-bold text-lg">刷题宝</div>
-                <div id="user-info" class="text-sm text-gray-500">李雪瑜 (202517040227)</div>
+                <div class="flex items-center gap-3" onclick="app.toggleSettings()">
+                    <div id="user-info" class="text-sm text-gray-500 cursor-pointer">[姓名] ([学号])</div>
+                    <i class="fa-solid fa-cog text-gray-400 cursor-pointer text-lg"></i>
+                </div>
             </div>
             
             <div id="main-container" class="flex-1 overflow-y-auto p-4 pb-20">
@@ -165,7 +168,7 @@
             <button onclick="app.exitQuiz()" class="w-10 h-10 flex items-center justify-start text-gray-600">
                 <i class="fa-solid fa-chevron-left text-xl"></i>
             </button>
-            <div class="flex-1 text-center font-medium text-lg text-gray-800">李雪瑜 (202517040227)</div>
+            <div class="flex-1 text-center font-medium text-lg text-gray-800">[姓名] ([学号])</div>
             <div class="w-10"></div> <!-- Spacer -->
         </header>
 
@@ -262,7 +265,7 @@
         const DATA_DIR = './data';
         
         // Generate Watermark
-        function initWatermark(name = "李雪瑜", id = "202517040227") {
+        function initWatermark(name = "[姓名]", id = "[学号]") {
             const container = document.getElementById('watermark-layer');
             const text = `${name}<br>${id}`;
             let html = '';
@@ -286,8 +289,8 @@
                 startTime: null,
                 timerInterval: null,
                 // User Settings
-                userName: "李雪瑜",
-                userId: "202517040227"
+                userName: "[姓名]",
+                userId: "[学号]"
             },
 
             async init() {
@@ -310,8 +313,8 @@
                 if (s) {
                     try {
                         const parsed = JSON.parse(s);
-                        this.data.userName = parsed.name || "李雪瑜";
-                        this.data.userId = parsed.id || "202517040227";
+                        this.data.userName = parsed.name || "[姓名]";
+                        this.data.userId = parsed.id || "[学号]";
                     } catch(e) {}
                 }
             },
