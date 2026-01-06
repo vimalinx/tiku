@@ -22,9 +22,9 @@
             z-index: 0; /* Bottom layer */
             overflow: hidden;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Slightly denser */
-            gap: 20px;
-            padding: 20px;
+            grid-template-columns: repeat(2, 1fr); /* Strictly 2 columns */
+            gap: 0;
+            padding: 0;
             opacity: 0.15; 
         }
         .watermark-item {
@@ -34,12 +34,12 @@
             justify-content: center;
             transform: rotate(-25deg);
             color: #000;
-            font-size: 13px;
+            font-size: 14px; /* Slightly larger */
             font-weight: 500;
             user-select: none;
             text-align: center;
             line-height: 1.5;
-            padding: 20px 0;
+            height: 180px; /* Fixed height for vertical spacing */
         }
 
         /* Custom UI Elements from Image */
